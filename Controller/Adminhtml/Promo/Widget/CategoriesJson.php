@@ -1,5 +1,6 @@
 <?php
 /**
+ *
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
@@ -8,12 +9,8 @@ namespace Magento\CatalogRule\Controller\Adminhtml\Promo\Widget;
 use Magento\Backend\App\Action\Context;
 use Magento\Catalog\Model\Category;
 use Magento\Framework\Registry;
-use Magento\Framework\App\Action\HttpPostActionInterface as HttpPostActionInterface;
 
-/**
- * Categories json widget for catalog rule
- */
-class CategoriesJson extends \Magento\CatalogRule\Controller\Adminhtml\Promo\Widget implements HttpPostActionInterface
+class CategoriesJson extends \Magento\CatalogRule\Controller\Adminhtml\Promo\Widget
 {
     /**
      * Core registry
@@ -80,11 +77,10 @@ class CategoriesJson extends \Magento\CatalogRule\Controller\Adminhtml\Promo\Wid
             if (!($category = $this->_initCategory())) {
                 return;
             }
-            $selected = $this->getRequest()->getPost('selected', '');
             $block = $this->_view->getLayout()->createBlock(
                 \Magento\Catalog\Block\Adminhtml\Category\Checkboxes\Tree::class
             )->setCategoryIds(
-                explode(',', $selected)
+                [$categoryId]
             );
             $this->getResponse()->representJson(
                 $block->getTreeJson($category)

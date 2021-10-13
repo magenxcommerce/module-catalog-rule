@@ -3,8 +3,6 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
-declare(strict_types=1);
-
 namespace Magento\CatalogRule\Model\ResourceModel\Product;
 
 use Magento\Catalog\Api\Data\ProductInterface;
@@ -13,11 +11,6 @@ use Magento\Framework\App\ObjectManager;
 use Magento\Framework\DB\Select;
 use Magento\Catalog\Model\ResourceModel\Product\LinkedProductSelectBuilderInterface;
 
-/**
- * Provide Select object for retrieve product id with minimal price
- *
- * @SuppressWarnings(PHPMD.CookieAndSessionMisuse)
- */
 class LinkedProductSelectBuilderByCatalogRulePrice implements LinkedProductSelectBuilderInterface
 {
     /**
@@ -84,11 +77,11 @@ class LinkedProductSelectBuilderByCatalogRulePrice implements LinkedProductSelec
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function build(int $productId, int $storeId) : array
+    public function build($productId)
     {
-        $timestamp = $this->localeDate->scopeTimeStamp($this->storeManager->getStore($storeId));
+        $timestamp = $this->localeDate->scopeTimeStamp($this->storeManager->getStore());
         $currentDate = $this->dateTime->formatDate($timestamp, false);
         $linkField = $this->metadataPool->getMetadata(ProductInterface::class)->getLinkField();
         $productTable = $this->resource->getTableName('catalog_product_entity');
@@ -108,7 +101,7 @@ class LinkedProductSelectBuilderByCatalogRulePrice implements LinkedProductSelec
                 sprintf('t.product_id = %s.%s', BaseSelectProcessorInterface::PRODUCT_TABLE_ALIAS, $linkField),
                 []
             )->where('parent.entity_id = ?', $productId)
-            ->where('t.website_id = ?', $this->storeManager->getStore($storeId)->getWebsiteId())
+            ->where('t.website_id = ?', $this->storeManager->getStore()->getWebsiteId())
             ->where('t.customer_group_id = ?', $this->customerSession->getCustomerGroupId())
             ->where('t.rule_date = ?', $currentDate)
             ->order('t.rule_price ' . Select::SQL_ASC)

@@ -12,11 +12,8 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Registry;
 use Magento\Framework\Stdlib\DateTime\Filter\Date;
 use Magento\Framework\App\Request\DataPersistorInterface;
-use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 
 /**
- * Save action for catalog rule
- *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class Save extends \Magento\CatalogRule\Controller\Adminhtml\Promo\Catalog implements HttpPostActionInterface
@@ -27,43 +24,34 @@ class Save extends \Magento\CatalogRule\Controller\Adminhtml\Promo\Catalog imple
     protected $dataPersistor;
 
     /**
-     * @var TimezoneInterface
-     */
-    private $localeDate;
-
-    /**
      * @param Context $context
      * @param Registry $coreRegistry
      * @param Date $dateFilter
      * @param DataPersistorInterface $dataPersistor
-     * @param TimezoneInterface $localeDate
      */
     public function __construct(
         Context $context,
         Registry $coreRegistry,
         Date $dateFilter,
-        DataPersistorInterface $dataPersistor,
-        TimezoneInterface $localeDate
+        DataPersistorInterface $dataPersistor
     ) {
         $this->dataPersistor = $dataPersistor;
-        $this->localeDate = $localeDate;
         parent::__construct($context, $coreRegistry, $dateFilter);
     }
 
     /**
-     * Execute save action from catalog rule
-     *
-     * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\ResultInterface|void
+     * @return void
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function execute()
     {
         if ($this->getRequest()->getPostValue()) {
+
             /** @var \Magento\CatalogRule\Api\CatalogRuleRepositoryInterface $ruleRepository */
             $ruleRepository = $this->_objectManager->get(
                 \Magento\CatalogRule\Api\CatalogRuleRepositoryInterface::class
             );
+
             /** @var \Magento\CatalogRule\Model\Rule $model */
             $model = $this->_objectManager->create(\Magento\CatalogRule\Model\Rule::class);
 
@@ -73,19 +61,6 @@ class Save extends \Magento\CatalogRule\Controller\Adminhtml\Promo\Catalog imple
                     ['request' => $this->getRequest()]
                 );
                 $data = $this->getRequest()->getPostValue();
-                if (!$this->getRequest()->getParam('from_date')) {
-                    $data['from_date'] = $this->localeDate->formatDate();
-                }
-                $filterValues = ['from_date' => $this->_dateFilter];
-                if ($this->getRequest()->getParam('to_date')) {
-                    $filterValues['to_date'] = $this->_dateFilter;
-                }
-                $inputFilter = new \Zend_Filter_Input(
-                    $filterValues,
-                    [],
-                    $data
-                );
-                $data = $inputFilter->getUnescaped();
                 $id = $this->getRequest()->getParam('rule_id');
                 if ($id) {
                     $model = $ruleRepository->get($id);
@@ -106,9 +81,6 @@ class Save extends \Magento\CatalogRule\Controller\Adminhtml\Promo\Catalog imple
                     $data['conditions'] = $data['rule']['conditions'];
                     unset($data['rule']);
                 }
-
-                unset($data['conditions_serialized']);
-                unset($data['actions_serialized']);
 
                 $model->loadPost($data);
 

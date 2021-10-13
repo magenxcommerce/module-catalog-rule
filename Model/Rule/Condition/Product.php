@@ -4,11 +4,12 @@
  * See COPYING.txt for license details.
  */
 
+/**
+ * Catalog Rule Product Condition data model
+ */
 namespace Magento\CatalogRule\Model\Rule\Condition;
 
 /**
- * Catalog Rule Product Condition data model
- *
  * @method string getAttribute() Returns attribute code
  */
 class Product extends \Magento\Rule\Model\Condition\Product\AbstractProduct
@@ -28,9 +29,6 @@ class Product extends \Magento\Rule\Model\Condition\Product\AbstractProduct
 
         $oldAttrValue = $model->getData($attrCode);
         if ($oldAttrValue === null) {
-            if ($this->getOperator() === '<=>') {
-                return true;
-            }
             return false;
         }
 
